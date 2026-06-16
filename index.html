@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make VN Default — Request Form</title>
+<style>
+  :root { color-scheme: light; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    width: 100%;
+    max-width: 580px;
+    overflow: hidden;
+  }
+  .card-header {
+    background: #0052CC;
+    padding: 24px 28px;
+    color: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .card-header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .card-header p  { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+  .btn-settings {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 12px;
+    margin-top: 2px;
+    transition: background 0.15s;
+  }
+  .btn-settings:hover { background: rgba(255,255,255,0.25); }
+
+  .card-body { padding: 28px; }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #172B4D;
+    margin-bottom: 6px;
+  }
+  .field label .req { color: #DE350B; margin-left: 2px; }
+  .field input, .field select {
+    width: 100%;
+    border: 1.5px solid #DFE1E6;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: #172B4D;
+    background: #FAFBFC;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+    font-family: inherit;
+  }
+  .field input:focus, .field select:focus {
+    border-color: #0052CC;
+    box-shadow: 0 0 0 2px rgba(0,82,204,0.15);
+    background: #fff;
+  }
+  .field .hint { font-size: 12px; color: #6B778C; margin-top: 4px; }
+  .divider { border: none; border-top: 1px solid #EBECF0; margin: 4px 0 20px; }
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #6B778C;
+    margin-bottom: 14px;
+  }
+
+  /* ── Jira-style panels ── */
+  .panel {
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #172B4D;
+  }
+  .panel-icon {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .panel-info { background: #DEEBFF; border-left: 4px solid #2684FF; }
+  .panel-info .panel-icon { background: #2684FF; color: #fff; }
+  .panel-note { background: #EAE6FF; border-left: 4px solid #6554C0; }
+  .panel-note .panel-icon { background: #6554C0; color: #fff; font-size: 13px; }
+  .panel-warn { background: #FFFAE6; border-left: 4px solid #FF991F; }
+  .panel-warn .panel-icon { background: #FF991F; color: #fff; }
+  .panel-text { color: #172B4D; margin-bottom: 6px; }
+  .panel-text:last-child { margin-bottom: 0; }
+
+  .panel-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .panel-field:last-child { margin-bottom: 0; }
+  .panel-field-label {
+    font-weight: 700;
+    font-size: 13px;
+    color: #172B4D;
+    min-width: 72px;
+    flex-shrink: 0;
+  }
+  .panel-field input {
+    flex: 1;
+    border: 1.5px solid #C0C8D8;
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 13px;
+    color: #172B4D;
+    background: rgba(255,255,255,0.7);
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .panel-field input:focus {
+    border-color: #0052CC;
+    box-shadow: 0 0 0 2px rgba(0,82,204,0.15);
+    background: #fff;
+  }
+
+  .vn-inline {
+    display: inline-block;
+    border: 1.5px solid #C0C8D8;
+    border-radius: 5px;
+    padding: 2px 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #006644;
+    background: rgba(255,255,255,0.7);
+    outline: none;
+    font-family: inherit;
+    width: 130px;
+    vertical-align: middle;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .vn-inline:focus {
+    border-color: #0052CC;
+    box-shadow: 0 0 0 2px rgba(0,82,204,0.15);
+    background: #fff;
+  }
+  .vn-prefix { color: #006644; font-weight: 700; }
+
+  /* ── Buttons ── */
+  .btn-submit {
+    width: 100%;
+    padding: 11px;
+    background: #0052CC;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .btn-submit:hover:not(:disabled) { background: #0043A4; }
+  .btn-submit:disabled { background: #B3D4FF; cursor: not-allowed; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-box {
+    display: none;
+    background: #E3FCEF;
+    border: 1.5px solid #57D9A3;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-top: 16px;
+  }
+  .success-box .success-title { font-weight: 700; color: #006644; font-size: 14px; }
+  .success-box .success-link  { margin-top: 8px; font-size: 13px; color: #006644; }
+  .success-box a { color: #0052CC; font-weight: 600; text-decoration: none; }
+  .success-box a:hover { text-decoration: underline; }
+
+  .error-box {
+    display: none;
+    background: #FFEBE6;
+    border: 1.5px solid #FF8F73;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #BF2600;
+  }
+
+  .btn-new {
+    width: 100%; margin-top: 12px; padding: 10px;
+    background: #fff; color: #0052CC; border: 1.5px solid #0052CC;
+    border-radius: 6px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s; display: none;
+  }
+  .btn-new:hover { background: #F4F5F7; }
+
+  /* ── Setup Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(9,30,66,0.54);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 10px;
+    padding: 28px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 8px 32px rgba(9,30,66,0.25);
+  }
+  .modal h2 { font-size: 17px; font-weight: 700; color: #172B4D; margin-bottom: 6px; }
+  .modal p  { font-size: 13px; color: #6B778C; margin-bottom: 20px; line-height: 1.5; }
+  .modal p a { color: #0052CC; }
+  .modal .field { margin-bottom: 14px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+  .btn-primary {
+    flex: 1; padding: 10px; background: #0052CC; color: #fff;
+    border: none; border-radius: 6px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #0043A4; }
+  .btn-ghost {
+    padding: 10px 16px; background: #fff; color: #42526E;
+    border: 1.5px solid #DFE1E6; border-radius: 6px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: background 0.15s;
+  }
+  .btn-ghost:hover { background: #F4F5F7; }
+  .token-note {
+    background: #FFFAE6;
+    border: 1px solid #FFD700;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #172B4D;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .token-note a { color: #0052CC; }
+</style>
+</head>
+<body>
+
+<!-- Setup / Settings Modal -->
+<div class="modal-overlay" id="setupModal">
+  <div class="modal">
+    <h2>Connect your Atlassian account</h2>
+    <p>Your credentials are saved only in your browser and never sent anywhere except directly to Jira.</p>
+    <div class="token-note">
+      Need an API token? Go to <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank">id.atlassian.com → API tokens</a> and create one.
+    </div>
+    <div class="field">
+      <label>Atlassian Email <span class="req">*</span></label>
+      <input type="email" id="modalEmail" placeholder="you@centerfield.com" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label>API Token <span class="req">*</span></label>
+      <input type="password" id="modalToken" placeholder="Paste your API token" autocomplete="off" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="saveCredentials()">Save &amp; Continue</button>
+      <button class="btn-ghost" id="cancelSetupBtn" onclick="closeModal()" style="display:none">Cancel</button>
+    </div>
+    <div class="error-box" id="modalError" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<!-- Main Form -->
+<div class="card">
+  <div class="card-header">
+    <div>
+      <h1>Submit a Request</h1>
+      <p>Creates a subtask under an existing Jira ticket.</p>
+    </div>
+    <button class="btn-settings" onclick="openSettings()">⚙ Account</button>
+  </div>
+  <div class="card-body">
+
+    <div class="section-label">Parent Ticket</div>
+
+    <div class="field">
+      <label>Parent Ticket Key <span class="req">*</span></label>
+      <input type="text" id="parentTicket" placeholder="e.g. B2B-123 or paste a Jira URL" oninput="onParentInput(this.value)" />
+      <div class="hint">The subtask will be created directly under this ticket.</div>
+    </div>
+
+    <div class="field">
+      <label>Priority</label>
+      <select id="priority">
+        <option value="">— None —</option>
+        <option value="Highest">Highest</option>
+        <option value="High">High</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="Low">Low</option>
+        <option value="Lowest">Lowest</option>
+      </select>
+    </div>
+
+    <hr class="divider">
+    <div class="section-label">Subtask Details</div>
+
+    <div class="field">
+      <label>Summary <span class="req">*</span></label>
+      <input type="text" id="summary" placeholder="Auto-filled from parent ticket" maxlength="255" />
+      <div class="hint">Editable — auto-filled when you enter a valid parent ticket above.</div>
+    </div>
+
+    <div class="section-label" style="margin-top:4px;">Description</div>
+
+    <!-- Blue: Background -->
+    <div class="panel panel-info">
+      <div class="panel-header">
+        <span class="panel-icon">i</span>
+        Background:
+      </div>
+      <p class="panel-text">
+        We ran a test on <strong id="domainDisplay">{Domain}</strong> using vns that activated certain changes and it won, we would like to make it default to the experience.
+      </p>
+      <p class="panel-text">
+        <span class="vn-prefix">Please make vn=</span><input class="vn-inline" id="vnValue" type="text" placeholder="input vns here" /><span class="vn-prefix"> default to the experience</span>
+      </p>
+    </div>
+
+    <!-- Purple: From Digi Ops -->
+    <div class="panel panel-note">
+      <div class="panel-header">
+        <span class="panel-icon">≡</span>
+        From Digi Ops:
+      </div>
+      <div class="panel-field">
+        <span class="panel-field-label">Offer:</span>
+        <input type="text" id="offer" placeholder="Enter offer name or ID" />
+      </div>
+      <div class="panel-field">
+        <span class="panel-field-label">Test Link:</span>
+        <input type="text" id="testLink" placeholder="https://…" />
+      </div>
+    </div>
+
+    <!-- Yellow: For QA -->
+    <div class="panel panel-warn">
+      <div class="panel-header">
+        <span class="panel-icon">⚠</span>
+        For QA:
+      </div>
+      <p class="panel-text">
+        Once released, <strong style="color:#006644">please pass back ticket to digi ops and assign to ready for ops</strong>, digi ops will go in and remove the vn from the URL.
+      </p>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="submitTicket()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btnLabel">Create Ticket</span>
+    </button>
+    <button class="btn-new" id="newBtn" onclick="resetForm()">+ Submit Another Request</button>
+
+    <div class="success-box" id="successBox">
+      <div class="success-title">✓ Ticket created!</div>
+      <div class="success-link" id="successLink"></div>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+
+  </div>
+</div>
+
+<script>
+const JIRA_BASE = 'https://centerfieldmedia.atlassian.net';
+
+// ── Credential management ──────────────────────────────────────
+function getCredentials() {
+  return {
+    email: localStorage.getItem('jira_email') || '',
+    token: localStorage.getItem('jira_token') || '',
+  };
+}
+
+function saveCredentials() {
+  const email = document.getElementById('modalEmail').value.trim();
+  const token = document.getElementById('modalToken').value.trim();
+  const err   = document.getElementById('modalError');
+  err.style.display = 'none';
+
+  if (!email || !token) {
+    err.style.display = 'block';
+    err.textContent   = 'Both fields are required.';
+    return;
+  }
+  if (!email.includes('@')) {
+    err.style.display = 'block';
+    err.textContent   = 'Enter a valid email address.';
+    return;
+  }
+
+  localStorage.setItem('jira_email', email);
+  localStorage.setItem('jira_token', token);
+  closeModal();
+}
+
+function openSettings() {
+  const { email } = getCredentials();
+  document.getElementById('modalEmail').value = email;
+  document.getElementById('modalToken').value = '';
+  document.getElementById('cancelSetupBtn').style.display = 'block';
+  document.getElementById('modalError').style.display = 'none';
+  document.getElementById('setupModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('setupModal').classList.remove('open');
+}
+
+// Show modal on load if no credentials saved
+window.addEventListener('DOMContentLoaded', () => {
+  const { email, token } = getCredentials();
+  if (!email || !token) {
+    document.getElementById('cancelSetupBtn').style.display = 'none';
+    document.getElementById('setupModal').classList.add('open');
+  }
+});
+
+// ── Form logic ─────────────────────────────────────────────────
+function extractTicketKey(value) {
+  // Accept full Jira URL: https://...atlassian.net/browse/B2B-123
+  const urlMatch = value.match(/\/browse\/([A-Za-z]+-\d+)/i);
+  if (urlMatch) return urlMatch[1].toUpperCase();
+  // Accept plain key: B2B-123
+  const keyMatch = value.trim().toUpperCase().match(/^([A-Z]+-\d+)$/);
+  if (keyMatch) return keyMatch[1];
+  return null;
+}
+
+function onParentInput(value) {
+  const key    = extractTicketKey(value);
+  const domain = key ? key.split('-')[0] : null;
+  document.getElementById('summary').value = domain
+    ? `[DEV][MOD] ${domain} - Make VN Default` : '';
+  document.getElementById('domainDisplay').textContent = domain || '{Domain}';
+}
+
+function buildADF(domain, vn, offer, testLink) {
+  const vnText   = vn       || 'input vns here';
+  const offerTxt = offer    || '(not provided)';
+  const linkTxt  = testLink || '(not provided)';
+
+  return {
+    version: 1,
+    type: 'doc',
+    content: [
+      {
+        type: 'panel',
+        attrs: { panelType: 'info' },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'Background:', marks: [{ type: 'strong' }] }] },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'We ran a test on ' },
+              { type: 'text', text: domain, marks: [{ type: 'strong' }] },
+              { type: 'text', text: ' using vns that activated certain changes and it won, we would like to make it default to the experience.' }
+            ]
+          },
+          {
+            type: 'paragraph',
+            content: [{
+              type: 'text',
+              text: `Please make vn=${vnText} default to the experience`,
+              marks: [{ type: 'strong' }, { type: 'textColor', attrs: { color: '#006644' } }]
+            }]
+          }
+        ]
+      },
+      {
+        type: 'panel',
+        attrs: { panelType: 'note' },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'From Digi Ops:', marks: [{ type: 'strong' }] }] },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Offer: ', marks: [{ type: 'strong' }] },
+              { type: 'text', text: offerTxt }
+            ]
+          },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Test Link: ', marks: [{ type: 'strong' }] },
+              testLink
+                ? { type: 'text', text: testLink, marks: [{ type: 'link', attrs: { href: testLink } }] }
+                : { type: 'text', text: linkTxt }
+            ]
+          }
+        ]
+      },
+      {
+        type: 'panel',
+        attrs: { panelType: 'warning' },
+        content: [
+          { type: 'paragraph', content: [{ type: 'text', text: 'For QA:', marks: [{ type: 'strong' }] }] },
+          {
+            type: 'paragraph',
+            content: [
+              { type: 'text', text: 'Once released, ' },
+              {
+                type: 'text',
+                text: 'please pass back ticket to digi ops and assign to ready for ops',
+                marks: [{ type: 'strong' }, { type: 'textColor', attrs: { color: '#006644' } }]
+              },
+              { type: 'text', text: ', digi ops will go in and remove the vn from the URL.' }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+}
+
+async function submitTicket() {
+  const parentRaw = extractTicketKey(document.getElementById('parentTicket').value);
+  const priority  = document.getElementById('priority').value;
+  const summary   = document.getElementById('summary').value.trim();
+  const vn        = document.getElementById('vnValue').value.trim();
+  const offer     = document.getElementById('offer').value.trim();
+  const testLink  = document.getElementById('testLink').value.trim();
+
+  if (!parentRaw) return alert('Please enter a parent ticket key (e.g. B2B-123) or paste a Jira URL.');
+  if (!summary)   return alert('Summary is required.');
+
+  const { email, token } = getCredentials();
+  if (!email || !token) { openSettings(); return; }
+
+  const project = parentRaw.split('-')[0];
+  const adf     = buildADF(project, vn, offer, testLink);
+
+  // UI: loading
+  const btn     = document.getElementById('submitBtn');
+  const spinner = document.getElementById('spinner');
+  const label   = document.getElementById('btnLabel');
+  btn.disabled          = true;
+  spinner.style.display = 'block';
+  label.textContent     = 'Creating…';
+  document.getElementById('successBox').style.display = 'none';
+  document.getElementById('errorBox').style.display   = 'none';
+
+  const body = {
+    fields: {
+      project:   { key: project },
+      issuetype: { name: 'Subtask' },
+      summary:   summary,
+      description: adf,
+      parent:    { key: parentRaw },
+    }
+  };
+  if (priority) body.fields.priority = { name: priority };
+
+  try {
+    const res = await fetch(`${JIRA_BASE}/rest/api/3/issue`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(`${email}:${token}`),
+        'Content-Type':  'application/json',
+        'Accept':        'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (res.status === 401) {
+      throw new Error('Authentication failed. Check your email and API token in ⚙ Account.');
+    }
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data?.errors ? Object.values(data.errors).join(', ') : (data?.errorMessages?.join(', ') || res.statusText);
+      throw new Error(msg);
+    }
+
+    const key  = data.key || '';
+    const link = `${JIRA_BASE}/browse/${key}`;
+
+    const successBox  = document.getElementById('successBox');
+    const successLink = document.getElementById('successLink');
+    successBox.style.display = 'block';
+    successLink.innerHTML = key
+      ? `Subtask <a href="${link}" target="_blank">${key}</a> created under <a href="${JIRA_BASE}/browse/${parentRaw}" target="_blank">${parentRaw}</a>.`
+      : `Ticket created in <strong>${project}</strong>.`;
+
+    document.getElementById('newBtn').style.display = 'block';
+    btn.style.display = 'none';
+
+  } catch (err) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'block';
+    errorBox.textContent   = err.message || 'Something went wrong.';
+    btn.disabled = false;
+  } finally {
+    spinner.style.display = 'none';
+    label.textContent     = 'Create Ticket';
+  }
+}
+
+function resetForm() {
+  document.getElementById('parentTicket').value  = '';
+  document.getElementById('priority').value      = 'Medium';
+  document.getElementById('summary').value       = '';
+  document.getElementById('vnValue').value       = '';
+  document.getElementById('offer').value         = '';
+  document.getElementById('testLink').value      = '';
+  document.getElementById('domainDisplay').textContent = '{Domain}';
+  document.getElementById('successBox').style.display = 'none';
+  document.getElementById('errorBox').style.display   = 'none';
+  document.getElementById('submitBtn').style.display  = 'flex';
+  document.getElementById('newBtn').style.display     = 'none';
+}
+</script>
+</body>
+</html>
